@@ -23,7 +23,8 @@ Body: %s
 func loadOpenApiYaml() {
 	// General setup
 	openApiFile := "./example/ip_api.yaml"
-	openApiFile = "./example/petstore_api.json"
+	// openApiFile = "./example/petstore2_api.json"
+	// openApiFile = "./example/petstore3_api.json"
 
 	// Setup from LLM
 	var providedQueryParams = map[string]string{}
