@@ -196,7 +196,7 @@ func main() {
 	log.Println("Successfully configured MCP server!")
 
 	if err := server.ServeStdio(s); err != nil {
-		log.Fatalln("Server error: %v\n", err)
+		log.Fatalf("Server error: %v\n", err)
 	}
 
 }
