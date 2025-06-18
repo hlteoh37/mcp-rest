@@ -68,41 +68,16 @@ func sanitize(input string) string {
 	return re.ReplaceAllString(input, "_")
 }
 
-type ToolStore struct {
-	ParsedTools map[string]*Tools
-}
-
-type Tools map[string]*Tool
-
-type Tool struct {
-	Path      string
-	Method    string
-	Operation *openapi3.Operation
-}
-
 func registerMCPTool(s *server.MCPServer, doc *openapi3.T) error {
 	c := resty.New()
 	defer c.Close()
-
-	toolStore := ToolStore{
-		ParsedTools: make(map[string]*Tools),
-	}
 
 	for path, pathItem := range doc.Paths.Map() {
 		sanitizedPath := sanitize(path)
 
 		validOperations := pathItem.Operations()
 
-		// Populate the internal data structure
-		tools := Tools{}
-		toolStore.ParsedTools[sanitizedPath] = &tools
 		for method, operation := range validOperations {
-			tools[method] = &Tool{
-				Path:      sanitizedPath,
-				Method:    method,
-				Operation: operation,
-			}
-
 			// TODO: How to add more specificity on the action req + resp?
 			// TODO: Add description on the side effect done + JSON result returned.
 			toolOptions := []mcp.ToolOption{}
