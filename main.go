@@ -176,7 +176,7 @@ func main() {
 	openApiFile := args[0]
 	openapiDoc, err := loadOpenApiYaml(openApiFile)
 	if err != nil {
-		log.Println("Encountered error when loading and parsing openapi doc", err)
+		log.Fatalln("Encountered error when loading and parsing openapi doc", err)
 	}
 
 	// Declare a new MCP server
@@ -189,13 +189,13 @@ func main() {
 
 	err = registerMCPTool(s, openapiDoc)
 	if err != nil {
-		log.Println("Encountered error when registering REST as MCP tools", err)
+		log.Fatalln("Encountered error when registering REST as MCP tools", err)
 	}
 
 	log.Println("Successfully configured MCP server!")
 
 	if err := server.ServeStdio(s); err != nil {
-		log.Printf("Server error: %v\n", err)
+		log.Fatalln("Server error: %v\n", err)
 	}
 
 }
