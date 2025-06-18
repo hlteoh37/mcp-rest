@@ -1,9 +1,9 @@
 {
   "mcpServers": {
     "ipadd": {
-      "command": "/Users/hongteoh/Documents/code-learning/ai-stuff/mcp-rest-go/mcp-rest-go",
+      "command": "/path/to/mcp-rest",
       "args": [
-        "/Users/hongteoh/Documents/code-learning/ai-stuff/mcp-rest-go/example/ip_api.yaml"
+        "/path/to/example/ip_api.yaml"
       ]
     }
   }

@@ -26,9 +26,9 @@ func returnFullResponse(resp *resty.Response) string {
 }
 
 // General setup
-// const openApiFile = "/Users/hongteoh/Documents/code-learning/ai-stuff/mcp-rest-go/example/ip_api.yaml"
-// openApiFile = "/Users/hongteoh/Documents/code-learning/ai-stuff/mcp-rest-go/example/petstore2_api.json"
-// openApiFile = "/Users/hongteoh/Documents/code-learning/ai-stuff/mcp-rest-go/example/petstore3_api.json"
+// const openApiFile = "example/ip_api.yaml"
+// openApiFile = "example/petstore2_api.json"
+// openApiFile = "example/petstore3_api.json"
 
 // Setup from LLM
 var providedQueryParams = map[string]string{}
