@@ -15,10 +15,6 @@ import (
 	"resty.dev/v3"
 )
 
-func printFullResponse(resp *resty.Response) {
-	log.Printf(returnFullResponse(resp))
-}
-
 func returnFullResponse(resp *resty.Response) string {
 	parts := []string{}
 	parts = append(parts, fmt.Sprintf("Status: %s", resp.Status()))
@@ -31,7 +27,6 @@ func returnFullResponse(resp *resty.Response) string {
 
 // General setup
 // const openApiFile = "/Users/hongteoh/Documents/code-learning/ai-stuff/mcp-rest-go/example/ip_api.yaml"
-
 // openApiFile = "/Users/hongteoh/Documents/code-learning/ai-stuff/mcp-rest-go/example/petstore2_api.json"
 // openApiFile = "/Users/hongteoh/Documents/code-learning/ai-stuff/mcp-rest-go/example/petstore3_api.json"
 
@@ -65,8 +60,6 @@ func generateToolDescription(doc *openapi3.T, method string, path string) string
 	descriptionParts = append(descriptionParts, fmt.Sprintf("HTTP path %s", path))
 	description := strings.Join(descriptionParts, "_")
 	description = sanitize(description)
-	// log.Println(len(description))
-	// log.Println(description)
 	return description
 }
 
@@ -90,9 +83,6 @@ type Tool struct {
 func registerMCPTool(s *server.MCPServer, doc *openapi3.T) error {
 	c := resty.New()
 	defer c.Close()
-
-	// log.Printf("%#v\n", doc.Paths)
-	// log.Println("")
 
 	toolStore := ToolStore{
 		ParsedTools: make(map[string]*Tools),
@@ -148,8 +138,8 @@ func registerMCPTool(s *server.MCPServer, doc *openapi3.T) error {
 					// }
 				default:
 					log.Printf("TODO: params of %s not supported yet.\n", param.Value.In)
-					// Support Header?
-					// Support URL params
+					// TODO: Support Header?
+					// TODO: Support URL params
 				}
 			}
 
@@ -176,15 +166,14 @@ func registerMCPTool(s *server.MCPServer, doc *openapi3.T) error {
 						}
 					default:
 						log.Printf("TODO: params of %s not supported yet.\n", param.Value.In)
-						// Support Header?
-						// Support URL params
+						// TODO: Support Header?
+						// TODO: Support URL params
 					}
 				}
 				urlPath := doc.Servers[0].URL + path
 
 				switch method {
 				case http.MethodGet:
-					// log.Printf("Performing %s on %s\n", method, urlPath)
 					resp, err := req.Get(urlPath)
 					if err != nil {
 						log.Println("Error when perfoming ", http.MethodGet, err)
@@ -196,11 +185,7 @@ func registerMCPTool(s *server.MCPServer, doc *openapi3.T) error {
 					return mcp.NewToolResultError(fmt.Sprintf("TODO: Unsupported method %s", method)), nil
 				}
 			})
-
-			// operation.Parameters = append(operation.Parameters, )
-
 		}
-
 	}
 
 	return nil
@@ -230,7 +215,7 @@ func main() {
 		log.Println("Encountered error when registering REST as MCP tools", err)
 	}
 
-	// log.Println("Successfully run main function!")
+	log.Println("Successfully configured MCP server!")
 
 	if err := server.ServeStdio(s); err != nil {
 		log.Printf("Server error: %v\n", err)
