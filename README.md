@@ -89,7 +89,3 @@ The repository includes several example OpenAPI specifications:
 3. Make your changes
 4. Add tests for new functionality
 5. Submit a pull request
-
-## License
-
-This project is open source. Please check the license file for details.
