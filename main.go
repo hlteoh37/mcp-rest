@@ -131,7 +131,7 @@ func registerMCPTool(s *server.MCPServer, doc *openapi3.T) error {
 					// 	req.SetQueryParam(param.Value.Name, value)
 					// } else {
 					// 	if param.Value.Required {
-					// 		errMsg := log.Sprintf("Required param %s but not provided.", param.Value.Name)
+					// 		errMsg := fmt.Sprintf("Required param %s but not provided.", param.Value.Name)
 					// 		log.Println(errMsg)
 					// 		return errors.New(errMsg)
 					// 	}
