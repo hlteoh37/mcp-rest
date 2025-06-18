@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "ipadd": {
+      "command": "/Users/hongteoh/Documents/code-learning/ai-stuff/mcp-rest-go/mcp-rest-go",
+      "args": [
+        "/Users/hongteoh/Documents/code-learning/ai-stuff/mcp-rest-go/example/ip_api.yaml"
+      ]
+    }
+  }
+}
