@@ -16,13 +16,13 @@ import (
 )
 
 func returnFullResponse(resp *resty.Response) string {
-	parts := []string{}
-	parts = append(parts, fmt.Sprintf("Status: %s", resp.Status()))
-	parts = append(parts, fmt.Sprintf("Status Code: %d", resp.StatusCode()))
-	parts = append(parts, fmt.Sprintf("Protocol: %s", resp.Proto()))
-	parts = append(parts, fmt.Sprintf("Headers: %#v", resp.Header()))
-	parts = append(parts, fmt.Sprintf("Body: %s", resp.String()))
-	return strings.Join(parts, "\n")
+	var b strings.Builder
+	b.WriteString(fmt.Sprintf("Status: %s\n", resp.Status()))
+	b.WriteString(fmt.Sprintf("Status Code: %d\n", resp.StatusCode()))
+	b.WriteString(fmt.Sprintf("Protocol: %s\n", resp.Proto()))
+	b.WriteString(fmt.Sprintf("Headers: %#v\n", resp.Header()))
+	b.WriteString(fmt.Sprintf("Body: %s\n", resp.String()))
+	return b.String()
 }
 
 // General setup
@@ -51,15 +51,16 @@ func loadOpenApiYaml(openApiFile string) (*openapi3.T, error) {
 }
 
 func generateToolDescription(doc *openapi3.T, method string, path string) string {
-	descriptionParts := []string{}
+	var b strings.Builder
 	// Add info about the REST
-	descriptionParts = append(descriptionParts, doc.Info.Title)
-	descriptionParts = append(descriptionParts, doc.Info.Description)
+	b.WriteString(doc.Info.Title + " ")
+	b.WriteString(doc.Info.Description + " ")
 	// Add info about the specific method call
-	descriptionParts = append(descriptionParts, fmt.Sprintf("HTTP method %s", method))
-	descriptionParts = append(descriptionParts, fmt.Sprintf("HTTP path %s", path))
-	description := strings.Join(descriptionParts, "_")
-	description = sanitize(description)
+	b.WriteString(fmt.Sprintf("HTTP method %s ", method))
+	b.WriteString(fmt.Sprintf("HTTP path %s ", path))
+	description := b.String()
+
+	// description = sanitize(description)
 	return description
 }
 
