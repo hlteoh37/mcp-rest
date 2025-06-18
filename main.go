@@ -60,7 +60,6 @@ func generateToolDescription(doc *openapi3.T, method string, path string) string
 	b.WriteString(fmt.Sprintf("HTTP path %s ", path))
 	description := b.String()
 
-	// description = sanitize(description)
 	return description
 }
 
