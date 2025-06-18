@@ -147,6 +147,8 @@ func registerMCPTool(s *server.MCPServer, doc *openapi3.T) error {
 				toolOptions...,
 			)
 
+			// Copy path to ensure it doesn't change before inline function is evaluated
+			pathCopy := path
 			// TODO: Define store for params, that can be shared between the MCP tool def + MCP tool function call
 			s.AddTool(newTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 				req := c.R()
@@ -170,7 +172,7 @@ func registerMCPTool(s *server.MCPServer, doc *openapi3.T) error {
 						// TODO: Support URL params
 					}
 				}
-				urlPath := doc.Servers[0].URL + path
+				urlPath := doc.Servers[0].URL + pathCopy
 
 				switch method {
 				case http.MethodGet:
