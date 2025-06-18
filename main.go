@@ -69,7 +69,7 @@ func sanitize(input string) string {
 	return re.ReplaceAllString(input, "_")
 }
 
-func registerMCPTool(s *server.MCPServer, doc *openapi3.T) error {
+func registerMCPTool(s *server.MCPServer, doc *openapi3.T, apiKey string) error {
 	c := resty.New()
 	defer c.Close()
 
@@ -90,6 +90,10 @@ func registerMCPTool(s *server.MCPServer, doc *openapi3.T) error {
 				switch param.Value.In {
 				// Support Query Params
 				case "query":
+					if param.Value.Name == "api_key" {
+						// Skip adding this as a required parameter.
+						continue
+					}
 					switch {
 					case param.Value.Schema.Value.Type.Includes("string"):
 						propertyOptions := []mcp.PropertyOption{}
@@ -103,15 +107,6 @@ func registerMCPTool(s *server.MCPServer, doc *openapi3.T) error {
 					default:
 						log.Printf("TODO: param type of %s not supported yet.\n", param.Value.Schema.Value.Type)
 					}
-					// if value, exists := providedQueryParams[param.Value.Name]; exists {
-					// 	req.SetQueryParam(param.Value.Name, value)
-					// } else {
-					// 	if param.Value.Required {
-					// 		errMsg := fmt.Sprintf("Required param %s but not provided.", param.Value.Name)
-					// 		log.Println(errMsg)
-					// 		return errors.New(errMsg)
-					// 	}
-					// }
 				default:
 					log.Printf("TODO: params of %s not supported yet.\n", param.Value.In)
 					// TODO: Support Header?
@@ -129,18 +124,23 @@ func registerMCPTool(s *server.MCPServer, doc *openapi3.T) error {
 			s.AddTool(newTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 				req := c.R()
 				for _, param := range operation.Parameters {
-
 					switch param.Value.In {
 					// Support Query Params
 					case "query":
-						if value, exists := providedQueryParams[param.Value.Name]; exists {
-							req.SetQueryParam(param.Value.Name, value)
-						} else {
-							if param.Value.Required {
-								errMsg := fmt.Sprintf("Required param %s but not provided.", param.Value.Name)
-								log.Println(errMsg)
-								return mcp.NewToolResultError(errMsg), nil
+						if param.Value.Name == "api_key" {
+							// Short circuit adding apiKey to the request
+							req.SetQueryParam(param.Value.Name, apiKey)
+							continue
+						}
+						switch {
+						case param.Value.Schema.Value.Type.Includes("string"):
+							p, err := request.RequireString(param.Value.Name)
+							if param.Value.Required && err != nil {
+								return mcp.NewToolResultErrorFromErr("Unable to find required query param", err), nil
 							}
+							req.SetQueryParam(param.Value.Name, p)
+						default:
+							return mcp.NewToolResultError(fmt.Sprintf("TODO: param type of %s not supported yet.\n", param.Value.Schema.Value.Type)), nil
 						}
 					default:
 						log.Printf("TODO: params of %s not supported yet.\n", param.Value.In)
@@ -148,6 +148,7 @@ func registerMCPTool(s *server.MCPServer, doc *openapi3.T) error {
 						// TODO: Support URL params
 					}
 				}
+
 				urlPath := doc.Servers[0].URL + pathCopy
 
 				switch method {
@@ -169,6 +170,11 @@ func registerMCPTool(s *server.MCPServer, doc *openapi3.T) error {
 	return nil
 }
 
+type ApiKeyDetails struct {
+	ApiKey         string
+	ApiKeyLocation string
+}
+
 func main() {
 	args := os.Args[1:]
 	if len(args) == 0 {
@@ -180,6 +186,11 @@ func main() {
 		log.Fatalln("Encountered error when loading and parsing openapi doc", err)
 	}
 
+	apiKey := os.Getenv("API_KEY")
+	if apiKey == "" {
+		log.Fatalln("Missing API_KEY from environment variable")
+	}
+
 	// Declare a new MCP server
 	s := server.NewMCPServer(
 		"Retrieve IP",
@@ -188,7 +199,7 @@ func main() {
 		server.WithRecovery(),
 	)
 
-	err = registerMCPTool(s, openapiDoc)
+	err = registerMCPTool(s, openapiDoc, apiKey)
 	if err != nil {
 		log.Fatalln("Encountered error when registering REST as MCP tools", err)
 	}
@@ -198,5 +209,4 @@ func main() {
 	if err := server.ServeStdio(s); err != nil {
 		log.Fatalf("Server error: %v\n", err)
 	}
-
 }
